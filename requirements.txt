@@ -1,0 +1,33 @@
+# AI Video Analytics Platform - Dependencies
+# Target Hardware: RTX 3050 (4GB VRAM), Intel 11th Gen i5 (4 workers), 24GB RAM
+
+# Deep Learning & Vision
+ultralytics>=8.2.0
+torch>=2.1.0
+torchvision>=0.16.0
+opencv-python>=4.8.0
+numpy>=1.24.0,<2.0.0
+scipy>=1.11.0
+pillow>=10.0.0
+
+# OCR & Embeddings
+paddleocr>=2.7.0
+onnxruntime>=1.16.0
+
+# Spatial Geometry & Tracking
+shapely>=2.0.0
+lapx>=0.5.5
+
+# Queue & Asynchronous Messaging
+redis>=5.0.0
+
+# Dashboard & WebSockets
+flask>=3.0.0
+flask-socketio>=5.3.0
+python-socketio>=5.10.0
+eventlet>=0.35.0
+
+# System Telemetry & Utilities
+psutil>=5.9.0
+pyyaml>=6.0
+requests>=2.31.0

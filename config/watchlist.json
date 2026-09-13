@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-09-12T10:00:00Z",
+  "watchlist": [
+    {
+      "id": "WLIST-SUSPECT-001",
+      "name": "Tariq Mahmood (Alias: Eagle-4)",
+      "category": "FLAGGED_INTRUDER",
+      "threat_level": "CRITICAL",
+      "designation": "Suspected Cross-Border Infiltrator",
+      "notes": "Red notice issued. Known to attempt perimeter crossing during zero-visibility hours.",
+      "embedding": null
+    },
+    {
+      "id": "WLIST-SUSPECT-002",
+      "name": "Vikram Rathore",
+      "category": "CONTRABAND_SUSPECT",
+      "threat_level": "HIGH",
+      "designation": "Narcotics/Smuggling Operative",
+      "notes": "Associated with modified 4x4 vehicles around Riverine sectors.",
+      "embedding": null
+    },
+    {
+      "id": "WLIST-AUTH-001",
+      "name": "Capt. Arjun Singh",
+      "category": "AUTHORIZED_PERSONNEL",
+      "threat_level": "INFO",
+      "designation": "BOP Alpha Commander",
+      "notes": "Cleared for unrestricted access across Sector 1 to 4.",
+      "embedding": null
+    },
+    {
+      "id": "WLIST-AUTH-002",
+      "name": "Sub-Inspector Priya Sharma",
+      "category": "AUTHORIZED_PERSONNEL",
+      "threat_level": "INFO",
+      "designation": "Intelligence & Surveillance Lead",
+      "notes": "Authorized perimeter patrol unit officer.",
+      "embedding": null
+    }
+  ]
+}

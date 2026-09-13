@@ -1,0 +1,5 @@
+names:
+  0: license_plate
+path: D:/SIH-yuh/data/datasets/plate_dataset
+train: images/train
+val: images/val
