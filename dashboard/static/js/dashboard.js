@@ -125,21 +125,53 @@ document.addEventListener('DOMContentLoaded', () => {
     liveClock.textContent = d.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
   }, 1000);
 
-  // --- WebSocket Setup ---
-  const socket = io();
+  // --- WebSocket Setup with Offline Fallback ---
+  let socket = null;
+  if (typeof io !== 'undefined') {
+    try {
+      socket = io();
+      socket.on('connect', () => {
+        console.log('[WebSocket] Connected to Central Command Server.');
+      });
+      socket.on('alert_event', (alert) => {
+        renderAlertCard(alert);
+        playAlertChime(alert.threat_level);
+      });
+      socket.on('fences_updated', () => {
+        loadFences();
+      });
+    } catch (e) {
+      console.warn('[WebSocket] Initialization notice:', e);
+    }
+  } else {
+    console.warn('[Dashboard] Socket.IO library unavailable; falling back to resilient HTTP alert polling.');
+  }
 
-  socket.on('connect', () => {
-    console.log('[WebSocket] Connected to Central Command Server.');
-  });
-
-  socket.on('alert_event', (alert) => {
-    renderAlertCard(alert);
-    playAlertChime(alert.threat_level);
-  });
-
-  socket.on('fences_updated', () => {
-    loadFences();
-  });
+  // Resilient Alert Polling Fallback (ensures alerts stream even if WebSockets or CDNs are blocked)
+  const seenAlertIds = new Set();
+  async function pollAlerts() {
+    try {
+      const res = await fetch('/api/alerts');
+      const data = await res.json();
+      const alerts = data.alerts || [];
+      if (!socket || !socket.connected) {
+        for (let i = alerts.length - 1; i >= 0; i--) {
+          const a = alerts[i];
+          if (!seenAlertIds.has(a.id)) {
+            seenAlertIds.add(a.id);
+            renderAlertCard(a);
+            playAlertChime(a.threat_level);
+          }
+        }
+      } else {
+        alerts.forEach(a => seenAlertIds.add(a.id));
+      }
+    } catch (e) {
+      // Ignore background poll errors
+    }
+  }
+  setInterval(pollAlerts, 2000);
+  pollAlerts();
 
   // --- Alert Feed Renderer ---
   function renderAlertCard(alert) {
