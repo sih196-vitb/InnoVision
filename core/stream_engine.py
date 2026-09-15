@@ -10,6 +10,7 @@ import numpy as np
 import time
 import threading
 import base64
+import json
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from config.settings import (
     CLASS_PERSON,
     VEHICLE_CLASSES,
     VIRTUAL_FENCES,
+    FENCES_FILE,
     QUEUE_FACES,
     QUEUE_PLATES,
     QUEUE_ANOMALY,
@@ -82,8 +84,6 @@ class VideoStreamReader:
         self.running = False
         if self.thread and self.thread.is_alive():
             self.thread.join(timeout=2.0)
-        if self.cap:
-            self.cap.release()
 
     def get_frame(self) -> Optional[np.ndarray]:
         with self.lock:
@@ -261,9 +261,20 @@ class StreamEngine:
         
         # Models and sub-modules
         self.zero_dce = ZeroDCEEnhancer(device=DEVICE)
-        self.fence_manager = VirtualFenceManager(VIRTUAL_FENCES, STREAM_WIDTH, STREAM_HEIGHT)
+        # Load persisted fences if available
+        loaded_fences = list(VIRTUAL_FENCES)
+        try:
+            if FENCES_FILE.exists():
+                with open(FENCES_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        loaded_fences = data
+        except Exception as e:
+            print(f"[StreamEngine] Failed to load persisted fences: {e}")
+
+        self.fence_manager = VirtualFenceManager(loaded_fences, STREAM_WIDTH, STREAM_HEIGHT)
         self.perimeter_mode = "manual"  # "manual" or "auto"
-        self.manual_fences = list(VIRTUAL_FENCES)
+        self.manual_fences = list(loaded_fences)
         self.auto_detector = AutoPerimeterDetector(STREAM_WIDTH, STREAM_HEIGHT)
 
         # Object Detection & ByteTrack Model
@@ -344,6 +355,12 @@ class StreamEngine:
         self.manual_fences = fences
         if self.perimeter_mode == "manual":
             self.fence_manager.update_fences(fences)
+            
+        try:
+            with open(FENCES_FILE, 'w', encoding='utf-8') as f:
+                json.dump(fences, f, indent=2)
+        except Exception as e:
+            print(f"[StreamEngine] Failed to save fences to disk: {e}")
 
     def get_latest_annotated_frame(self) -> Optional[np.ndarray]:
         """Returns the latest annotated visualization frame."""

@@ -16,7 +16,8 @@ from config.settings import (
     QUEUE_ANOMALY,
     ANOMALY_WINDOW_SIZE,
     ANOMALY_SAMPLE_FPS,
-    ANOMALY_SCORE_THRESHOLD
+    ANOMALY_SCORE_THRESHOLD,
+    CAMERA_ID
 )
 
 
@@ -70,7 +71,7 @@ class AnomalyWorker(BaseWorker):
             alert_payload = {
                 "alert_type": "BEHAVIORAL_ANOMALY",
                 "threat_level": "CRITICAL" if score > 0.85 else "HIGH",
-                "camera_id": item.get("camera_id", "BOP-ALPHA"),
+                "camera_id": item.get("camera_id", CAMERA_ID),
                 "anomaly_type": atype,
                 "anomaly_score": score,
                 "motion_energy": energy,

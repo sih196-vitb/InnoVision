@@ -16,7 +16,8 @@ from config.settings import (
     QUEUE_FACES,
     WATCHLIST_FILE,
     FRS_MATCH_THRESHOLD,
-    WEIGHTS_DIR
+    WEIGHTS_DIR,
+    CAMERA_ID
 )
 
 
@@ -79,7 +80,7 @@ class FRSWorker(BaseWorker):
             alert_payload = {
                 "alert_type": "FRS_WATCHLIST_HIT",
                 "threat_level": threat,
-                "camera_id": item.get("camera_id", "BOP-ALPHA"),
+                "camera_id": item.get("camera_id", CAMERA_ID),
                 "track_id": item.get("track_id", "P-001"),
                 "suspect_id": match.get("id"),
                 "name": name,

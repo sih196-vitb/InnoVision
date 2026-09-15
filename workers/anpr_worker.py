@@ -16,7 +16,8 @@ from config.settings import (
     QUEUE_PLATES,
     BLACKLIST_PLATES,
     WHITELIST_PLATES,
-    ANPR_OCR_LANG
+    ANPR_OCR_LANG,
+    CAMERA_ID
 )
 
 
@@ -80,7 +81,7 @@ class ANPRWorker(BaseWorker):
         alert_payload = {
             "alert_type": "ANPR_DETECTION",
             "threat_level": threat_level,
-            "camera_id": item.get("camera_id", "BOP-ALPHA"),
+            "camera_id": item.get("camera_id", CAMERA_ID),
             "track_id": item.get("track_id", "V-001"),
             "plate_number": plate_text,
             "registration_status": status,
