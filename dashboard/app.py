@@ -280,10 +280,21 @@ def handle_ws_fence_update(data):
     if data and "fence" in data and stream_engine:
         new_fence = data["fence"]
         # Append or update fence
-        current_cfgs = list(VIRTUAL_FENCES)
-        current_cfgs.append(new_fence)
-        stream_engine.fence_manager.update_fences(current_cfgs)
-        emit('fences_updated', {'status': 'updated'}, broadcast=True)
+        current_cfgs = list(stream_engine.manual_fences)
+        
+        # Check if updating an existing fence
+        updated = False
+        for i, f in enumerate(current_cfgs):
+            if f.get("id") == new_fence.get("id"):
+                current_cfgs[i] = new_fence
+                updated = True
+                break
+                
+        if not updated:
+            current_cfgs.append(new_fence)
+            
+        stream_engine.update_manual_fences(current_cfgs)
+        emit('fences_updated', {'status': 'updated', 'fences': current_cfgs, 'mode': 'manual'}, broadcast=True)
 
 
 def run_dashboard():

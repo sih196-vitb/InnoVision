@@ -9,6 +9,7 @@ import json
 import base64
 import cv2
 import numpy as np
+import threading
 from pathlib import Path
 from typing import Dict, Optional, List, Callable
 from config.settings import LOGS_DIR, QUEUE_ALERTS, CHANNEL_ALERTS
@@ -24,6 +25,7 @@ class AlertManager:
         self.recent_alerts: Dict[str, float] = {}  # key: f"{alert_type}:{track_id or entity}" -> last_time
         self.alert_subscribers: List[Callable[[Dict], None]] = []
         self.log_file = LOGS_DIR / "alerts.jsonl"
+        self._file_lock = threading.Lock()
 
     def register_callback(self, callback: Callable[[Dict], None]):
         """Registers a direct Python callable (e.g., Flask-SocketIO emit handler)."""
@@ -78,8 +80,9 @@ class AlertManager:
 
         # 1. Log to JSON Lines file
         try:
-            with open(self.log_file, "a", encoding="utf-8") as f:
-                f.write(json.dumps(payload) + "\n")
+            with self._file_lock:
+                with open(self.log_file, "a", encoding="utf-8") as f:
+                    f.write(json.dumps(payload) + "\n")
         except Exception as e:
             print(f"[AlertManager] Logging error: {e}")
 

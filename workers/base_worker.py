@@ -138,7 +138,8 @@ class MessageBroker:
             try:
                 return json.loads(raw)
             except json.JSONDecodeError:
-                return raw
+                print(f"[MessageBroker] Dropped malformed JSON payload from {queue_name}")
+                return None
         except queue.Empty:
             return None
 
