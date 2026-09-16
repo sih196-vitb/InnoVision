@@ -9,7 +9,8 @@ import cv2
 import json
 import time
 import psutil
-from flask import Flask, render_template, Response, request, jsonify
+import numpy as np
+from flask import Flask, Response, request, jsonify
 from flask_socketio import SocketIO, emit
 from pathlib import Path
 from typing import Optional
@@ -60,11 +61,6 @@ def broadcast_alert_to_clients(alert_payload: dict):
     except Exception as e:
         print(f"[Dashboard] SocketIO broadcast error: {e}")
 
-
-@app.route('/')
-def index():
-    """Renders main tactical command center UI."""
-    return render_template('index.html')
 
 
 def generate_mjpeg_stream():
