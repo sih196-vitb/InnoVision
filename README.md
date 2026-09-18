@@ -17,13 +17,13 @@ A high-throughput tactical perimeter surveillance platform that transforms legac
   - Dataloader workers set to `4` (optimized for Intel 11th Gen i5 CPU).
   - Fine-tuning scripts enforce `batch=8` (or `batch=4` under OS memory contention) with FP16 Automatic Mixed Precision (`amp=True`).
   - Dataset RAM caching (`cache=True`) takes full advantage of the workstation's **24GB System RAM**, completely eliminating disk I/O bottlenecks.
-- **Central Command Center Dashboard**: Flask & Flask-SocketIO web console featuring low-latency MJPEG video streaming, real-time alert logs with crop snapshots, interactive polygon drawing for virtual fence zones, and live telemetry for GPU VRAM and CPU utilization.
+- **Central Command Center Dashboard**: Modern React + Vite frontend communicating with a Flask-SocketIO backend API. Features low-latency MJPEG video streaming, real-time alert logs with crop snapshots, interactive polygon drawing for virtual fence zones, and live telemetry for GPU VRAM and CPU utilization.
 
 ---
 
 ## Directory Structure
 
-```
+```text
 d:\SIH-yuh\
 ├── config/
 │   ├── settings.py           # Unified hardware profiles, thresholds, and stream URLs
@@ -47,14 +47,13 @@ d:\SIH-yuh\
 │   ├── train_yolo.py         # General-purpose BOP threat model fine-tuning script
 │   └── prepare_dataset.py    # YOLO-format dataset builder and synthetic validator
 ├── dashboard/
-│   ├── app.py                # Flask-SocketIO server with REST endpoints and WebSocket events
-│   ├── templates/
-│   │   └── index.html        # Tactical dark military HUD dashboard
-│   └── static/
-│       ├── css/dashboard.css # High-contrast cyber-military command styling
-│       └── js/dashboard.js   # WebSocket client, interactive polygon editor, audio sirens
-├── run_platform.py           # Unified single-command system orchestrator
-├── setup.bat                 # Windows setup & dependency configuration script
+│   └── app.py                # Flask-SocketIO backend API and WebSocket server
+├── dashboard-ui/             # React + Vite Frontend
+│   ├── src/                  # React components, styles, and hooks
+│   ├── package.json          # Frontend dependencies and scripts
+│   └── vite.config.js        # Vite config with backend proxy setup
+├── run_platform.py           # Unified single-command system orchestrator (Backend)
+├── setup.bat                 # Windows setup & dependency configuration script (Backend)
 └── requirements.txt          # Deep learning & vision platform dependencies
 ```
 
@@ -62,15 +61,15 @@ d:\SIH-yuh\
 
 ## Quickstart Guide
 
-### 1. Automated Setup (Windows)
+### 1. Automated Setup (Windows Backend)
 
-Run the automated setup script to configure the Python virtual environment and dependencies:
+Run the automated setup script to configure the Python virtual environment and dependencies for the core backend:
 
 ```cmd
 setup.bat
 ```
 
-### 2. Manual Environment Configuration
+### 2. Manual Environment Configuration (Backend)
 
 If configuring manually via PowerShell / Command Prompt:
 
@@ -86,9 +85,9 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 ```
 
-### 3. Launching the Platform
+### 3. Launching the Backend Platform
 
-To launch the complete platform (Ingestion Engine + Specialist Workers + Command Dashboard):
+To launch the complete core platform (Ingestion Engine + Specialist Workers + Command Backend):
 
 ```cmd
 # Run with the built-in synthetic BOP surveillance feed
@@ -101,10 +100,19 @@ python run_platform.py --source "rtsp://admin:password@192.168.1.108:554/stream1
 python run_platform.py --source 0
 ```
 
-Open your browser and navigate to:
+The Flask backend and WebSocket server will run on `http://localhost:5000`.
+
+### 4. Launching the Frontend Dashboard (React UI)
+
+The frontend is a modern React application built with Vite. Open a **new** terminal window and run:
+
+```cmd
+cd dashboard-ui
+npm install
+npm run dev
 ```
-http://localhost:5000
-```
+
+Open your browser and navigate to the Vite local dev server (typically `http://localhost:5173`). The frontend is configured to automatically proxy API and WebSocket requests to the backend on port 5000.
 
 ---
 
@@ -141,4 +149,3 @@ python training/train_plate_detector.py
 - `amp=True` (FP16 Automatic Mixed Precision halves tensor memory footprint).
 - `workers=4` (tuned for Intel 11th Gen i5 quad-core throughput).
 - `cache=True` (loads dataset tensors into the 24GB System RAM, speeding up epoch times by 400%).
-#
